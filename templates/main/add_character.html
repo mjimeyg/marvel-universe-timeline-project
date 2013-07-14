@@ -1,0 +1,40 @@
+{include file='header.html'}
+{if $success == true}
+
+<div class="form_success_result">
+    <h2>{$values.name}</h2>
+    <div><img src="{$image_path}{$character_thumbnail_path}{$values.image}" /></div>
+    <div><a href="{$values>href}">{$values.href}</a></div>
+</div>
+{/if}
+{if $errors != ""}
+<div class="form_errors">
+	{$errors}
+</div>
+{/if}
+
+<p><strong>NOTICE:</strong> Please check to see if the data you are about to enter already exists by using the edit pages.</p>
+<form id="add_character_form" action="{$php_self}" method="post" enctype="multipart/form-data">
+    <fieldset>
+        
+        <dl>
+            <dt><label for="character_name">Character Name:</label></dt>
+            <dd><input name="character_name" id="character_name" type="text" value="" /><a class="tooltip" href="#">?<span class="basic_tooltip">{$lang.TOOLTIP_CHARACTER_NAME}</span></a></dd>
+        </dl>
+        
+        <dl>
+            <dt><label for="file">Character Image:</label></dt>
+            <dd><input name="file" id="file" type="file" /><a class="tooltip" href="#">?<span class="basic_tooltip">{$lang.TOOLTIP_CHARACTER_IMAGE}</span></a></dd>
+        </dl>
+        
+        <dl>
+            <dt><label for="character_source">Character Source:</label></dt>
+            <dd><input name="character_source" id="character_source" type="text" value="" /><a class="tooltip" href="#">?<span class="basic_tooltip">{$lang.TOOLTIP_CHARACTER_SOURCE}</span></a></dd>
+        </dl>
+        
+        <p><input name="reset" id="reset" type="reset" />&nbsp;&nbsp;<input name="submit" id="submit" type="submit" value="submit" /></p>
+        
+    </fieldset>
+</form>
+
+{include file='footer.html'}

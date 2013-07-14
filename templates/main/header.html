@@ -1,0 +1,110 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://ogp.me/ns/fb#">
+    <head>
+        <title>Marvel Timeline Project</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="keywords" content="Marvel, Timeline, Marvel.com, marvel-timeline, X-Men, Avengers, Deadpool" />
+        <meta name="description" content="A community site dedicated to creating a timeline of Marvel Comics." />
+        <meta property="og:image" content="{$event_thumbnail_path}{$event_image}" />
+        <meta property="og:title" content="{$event_title} #{$event_issue_number}" />
+        <meta property="og:url" content="{$site_url}{$event_path}" />
+        <meta property="og:description" content="{$event_description}" />
+        <meta property="og:site_name" content="Marvel Timeline" />
+        
+        <!-- Add jQuery library -->
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js" type="text/javascript"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js" type="text/javascript"></script>
+        <script src="includes/CSTimeline.js" type="text/javascript"></script>
+        <link rel="stylesheet" type="text/css" href="includes/CSTimeline.css" />
+
+        <script type="text/javascript" src="./includes/tinymce/tinymce.min.js"></script>
+		<script type="text/javascript">
+        tinymce.init({
+            selector: "textarea"
+         });
+        </script>
+	</head>
+
+    <body>
+    <div id="body_content" class="body_content">
+    	<a name="top"></a>
+        <div id="fb-root"></div>
+		<script type="text/javascript">
+          // Additional JS functions here
+          window.fbAsyncInit = function() {
+            FB.init({
+              appId      : '151142891650131', // App ID
+              channelUrl : 'www.marvel-timeline.com/channel.html', // Channel File
+              status     : true, // check login status
+              cookie     : true, // enable cookies to allow the server to access the session
+              xfbml      : true  // parse XFBML
+            });
+        
+            
+			};
+          
+        
+          // Load the SDK Asynchronously
+          
+			(function(d, s, id) {
+			  var js, fjs = d.getElementsByTagName(s)[0];
+			  if (d.getElementById(id)) return;
+			  js = d.createElement(s); js.id = id;
+			  js.src = "//connect.facebook.net/en_GB/all.js#xfbml=1&appId=151142891650131";
+			  fjs.parentNode.insertBefore(js, fjs);
+			}(document, 'script', 'facebook-jssdk'));
+            
+		   function login() {
+				FB.login(function(response) {
+					if (response.authResponse) {
+						// connected
+					} else {
+						// cancelled
+					}
+				});
+			}
+			
+			$(document).ready(function(e){
+				$("#site_menu").css({
+					'position': 'absolute',
+					'top': $("#header").offset().top + 'px',
+					'left': $("#header").offset().left + 'px'
+				});
+				
+				$("#site_menu").unbind('click').bind('click', function(e){
+					var menu_count = $("#site_menu").children().length;
+					
+					$("#site_menu").height($("#menu_root").height() * menu_count);
+				});
+				$("#site_menu").unbind('mouseleave').bind('mouseleave', function(e){
+					
+					$("#site_menu").height($("#menu_root").height());
+				});
+				
+				
+			});
+			
+        </script>
+        <div class="body_background"></div>
+        <div id="header" class="header">
+            <div id="site_menu" class="site_menu">
+                <div id="menu_root" class="site_menu_root" style="background-image:url(../images/buttons/site-menu-menu.jpg)"></div>
+                <div id="menu_item_1" class="site_menu_item" style="background-image:url(../images/buttons/site-menu-home.jpg)" onclick="window.location='./index.php'"></div>
+                <div id="menu_item_2" class="site_menu_item" style="background-image:url(../images/buttons/site-menu-add-event.jpg)" onclick="window.location='./add_event.php'"></div>
+                <div id="menu_item_3" class="site_menu_item" style="background-image:url(../images/buttons/site-menu-add-comic.jpg)" onclick="window.location='./add_comic.php'"></div>
+                <div id="menu_item_4" class="site_menu_item" style="background-image:url(../images/buttons/site-menu-add-character.jpg)" onclick="window.location='./add_character.php'"></div>
+                <div id="menu_item_5" class="site_menu_item" style="background-image:url(../images/buttons/site-menu-edit-event.jpg)" onclick="window.location='./edit_event.php'"></div>
+                <div id="menu_item_6" class="site_menu_item" style="background-image:url(../images/buttons/site-menu-edit-comic.jpg)" onclick="window.location='./edit_comic.php'"></div>
+                <div id="menu_item_7" class="site_menu_item" style="background-image:url(../images/buttons/site-menu-edit-character.jpg)" onclick="window.location='./edit_character.php'"></div>
+                <div id="menu_item_8" class="site_menu_item" style="background-image:url(../images/buttons/site-menu-faq.jpg)" onclick="window.location='./faq.php'"></div>
+            </div>
+            
+            {if $is_logged_in == true}
+            	<div id="facebook_login" class="facebook_login"><fb:login-button show-faces="true" width="200" max-rows="1"></fb:login-button></div>
+            {else}
+            	<div id="facebook_login" class="facebook_login"><a href="./login.php?redirect={$encoded_url}"><img src="includes/create_fb_button.php?label=Log%20in%20with%20Facebook" /></a></div>
+            {/if}
+            
+            <div id="banner" class="site_banner" onclick="window.location='./index.php';"></div>
+        </div>
+        

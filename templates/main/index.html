@@ -1,0 +1,53 @@
+{include file='header.html'}
+		{literal}
+		<script> 
+			// wait for the DOM to be loaded 
+			$(document).ready(function() { 
+				
+				$.getJSON('get_timeline_data.php', function(data){
+					
+					$("#timeline").csTimeline({timeline_data: data});
+				});
+				
+				$("#fullscreen").unbind('click').bind('click', function(e){
+					e.preventDefault();
+					console.log('clicked');
+					$("#timeline").css({
+						'position':'absolute',
+						'top':'0px',
+						'left':'0px'
+					})
+					.width($(window).width())
+					.height($(window).height());
+				});
+			}); 
+			
+			
+		</script>
+        {/literal}
+        <fb:like href="http://www.marvel-timeline.com" send="true" layout="button_count" width="450" show_faces="true" colorscheme="dark"></fb:like>
+        <!--<span style="float:right;"><a  id="fullscreen" href="#">Full Screen</a></span>-->
+        <div id="timeline" name="timeline" class="timeline"></div>
+        <div id="facebook_like-box" class="facebook_plugin">
+        	<fb:like-box href="https://www.facebook.com/mu.timeline.project" width="292" show_faces="true" stream="true" show_border="true" header="true"></fb:like-box>
+        </div>
+        
+        <div class="site_introduction">
+        	<h2>Welcome to the Marvel Universe Timeline Project</h2>
+            
+            <p>
+            	This is a community based project where members of the community can take a look at the history of events that occur in Marvel Comics.  
+            	You can compare the comics of the X-Men and see what they were up to when Spiderman first turned up.  You can find out where all the other characters were doing during the events of the Civil War.
+            </p>
+            <p>
+            	But the community part is the most important part, if you, the community, doesn't help and keep updating the timeline then... well nothing really.  There will be no timeline, no description of what happened,
+                ALL LIFE ON EARTH MAY END!!!
+            </p>
+            <p>
+            	But probably not.
+            </p>
+            <p>
+            	So, you know what this is, you know what to do to keep it going.  Spread the word and spread the knowledge of Marvel.
+            </p>
+        </div>
+{include file='footer.html'}

@@ -1,0 +1,82 @@
+{include file='header.html'}
+
+{if $success == true}
+
+<div class="form_success_result">
+    <h2>{$values.title}</h2>
+    <div><img src="{$image_path}{$comic_thumbnail_path}{$values.image}" /></div>
+</div>
+
+{/if}
+
+{if $errors != ""}
+
+<div class="form_errors">
+	{$errors}
+</div>
+
+{/if}
+
+<script>
+{literal}
+	$(document).ready(function(){
+		{/literal}var comic_thumbnail_path = "{$image_path}{$comic_thumbnail_path}";
+		
+		var comic_list = {$comic_list};
+		{literal}
+		$("#comic_list").autocomplete({
+			source: comic_list,
+			select: function(event, ui){
+				{/literal}window.location = '{$php_self}?id=' + ui.item.value;{literal}
+				return false;
+			},
+			focus: function(event, ui){
+				$("#comic_list").val(ui.item.label);
+				return false;
+			},
+			messages:{
+				noResults: '',
+				results:function(){}
+			}
+		})
+		.data("ui-autocomplete")._renderItem = function(ul, item){
+			return $('<li>')
+				.append('<a><img src="' + comic_thumbnail_path + item.icon + '" height="30px">' + item.label + '</a>')
+				.appendTo(ul);
+		};
+	});
+{/literal}
+</script>
+
+	<fieldset>
+		<dl>
+          <dt><label for="comic_list">Comic List <a class="tooltip" href="#">?<span class="basic_tooltip">{$lang.TOOLTIP_COMIC_TITLE_CHOOSER}</span></a></label></dt>
+          <dd><div class="ui-widget"><input type="text" name="comic_list" id="comic_list" placeholder="Start typing..." /></div></dd>
+      	</dl>
+	</fieldset>
+
+{if $id > 0}
+<form id="add_comic_form" action="{$_SERVER.PHP_SELF}" method="post" enctype="multipart/form-data">
+      <fieldset>
+      
+      <dl>
+          <dt><label for="comic_title">Comic Title: <a class="tooltip" href="#">?<span class="basic_tooltip">{$lang.TOOLTIP_COMIC_TITLE}</span></a></label></dt>
+          <dd><input name="comic_title" id="comic_title" type="text" value="{$comic_title}" /></dd>
+      </dl>
+      
+      <dl>
+          <dt><label for="comic_image">Comic Image: <a class="tooltip" href="#">?<span class="basic_tooltip">{$lang.TOOLTIP_COMIC_IMAGE}</span></a></label></dt>
+          <dd>
+           
+              <input name="file" id="file" type="file" /><img src="{$image_path}{$comic_thumbnail_path}{$comic_image}" /></dd>
+      </dl>
+      
+      <p><input name="reset" id="reset" type="reset" /><input name="submit" id="submit" type="submit" value="submit" /></p>
+      <input type="hidden" name="id" value="{$id}" />
+        <input type="hidden" name="ori_name" value="{$comic_title}" />
+        <input type="hidden" name="ori_image" value="{$comic_image}" />
+        <input type="hidden" name="ori_edited" value="{$edited_by}" />
+  </fieldset>
+</form>
+{/if}
+{include file='footer.html'}

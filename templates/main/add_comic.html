@@ -1,0 +1,38 @@
+{include file='header.html'}
+
+{if $success == true}
+<div class="form_success_result">
+    <h2>{$values.title}</h2>
+    <div><img src="{$image_path}{$comic_thumbnail_path}{$values.image}" /></div>
+</div>
+{/if}
+
+{if $errors != ""}
+<div class="form_errors">
+	{$errors}
+</div>
+{/if}
+
+<p><strong>NOTICE:</strong> Please check to see if the data you are about to enter already exists by using the edit pages.</p>
+<form id="add_comic_form" action="{$php_self}" method="post" enctype="multipart/form-data">
+      <fieldset>
+      
+      <dl>
+          <dt><label for="comic_title">Comic Title:</label></dt>
+          <dd><input name="comic_title" id="comic_title" type="text" /><a class="tooltip" href="#">?<span class="basic_tooltip">{$lang.TOOLTIP_COMIC_TITLE}</span></a></dd>
+      </dl>
+      
+      <dl>
+          <dt><label for="comic_image">Comic Image:</label></dt>
+          <dd>
+           
+              <input name="file" id="file" type="file" /><a class="tooltip" href="#">?<span class="basic_tooltip">{$lang.TOOLTIP_COMIC_IMAGE}</span></a></dd>
+      </dl>
+      
+      <p><input name="reset" id="reset" type="reset" /><input name="submit" id="submit" type="submit" value="submit" /></p>
+      
+  </fieldset>
+</form>
+
+
+{include file='footer.html'}

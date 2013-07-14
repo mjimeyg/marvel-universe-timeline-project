@@ -1,0 +1,266 @@
+{include file='header.html'}
+
+{if $success == true}
+<div class="form_success_result">
+    <h2>{$comic.title}&nbsp;#{$event.issue_number} - UPDATED</h2>
+    <div><img src="{$image_path}{$event_thumbnail_path}{$event.image}" /></div>
+</div>
+{/if}
+
+{if $errors != ''}
+<div class="form_errors">
+	{$errors}
+</div>
+{/if}
+
+
+<script type="text/javascript">
+var comic_thumbnail_path = "{$image_path}{$comic_thumbnail_path}";
+		
+	$(document).ready(function(){
+		var comic_thumbnail_path = "{$image_path}{$comic_thumbnail_path}";
+		
+		var comic_list = {$comic_list};
+		
+		$('#comic_list_year_container').hide();
+		{literal}
+		$("#comic_list").autocomplete({
+			source: comic_list,
+			select: function(event, ui){
+				var url = './get_timeline_data.php?comic_where=' + escape("id=" + ui.item.value);
+				$('#comic_list_year').append(
+									$('<option value="-1">Choose a year...</option>')
+										
+								);
+				$.getJSON(url, function(data){
+					//console.log(data);
+					$.each(data, function(index, value){
+						$.each(value.events, function(key, e){
+							
+						});
+						
+					});
+					$("#event_list").show();
+					generate_event_list(data);
+				});
+				return false;
+			},
+			focus: function(event, ui){
+				$("#comic_list").val(ui.item.label);
+				return false;
+			},
+			messages:{
+				noResults: '',
+				results:function(){}
+			}
+		})
+		
+		.data("ui-autocomplete")._renderItem = function(ul, item){
+			return $('<li>')
+				.append('<a><img src="' + comic_thumbnail_path + item.icon + '" height="30px">' + item.label + '</a>')
+				.appendTo(ul);
+		};
+		{/literal}
+	});
+	{literal}
+	function generate_event_list(data){
+		var event_list = $('#event_list');
+		
+		$.each(data, function(index, value){
+			$.each(value.events, function(key, e){
+				var new_event = $('<div id="event_' + e.id + '">')
+						.append($('<img>').attr('src', e.image)
+											.attr('height', '50px'))
+						.append($('<span>').html(e.title))
+						.unbind().bind('click', {id: e.id}, function(ev){
+							console.log(ev.data);
+							{/literal}window.location = "{$php_self}?id=" + ev.data.id;{literal}
+						})
+						.appendTo(event_list);
+			});
+		});
+	}
+	{/literal}
+</script>
+
+<fieldset>
+	<dl>
+          <dt><label for="comic_list">Comic List</label></dt>
+          <dd><div class="ui-widget"><input type="text" name="comic_list" id="comic_list" placeholder="Start typing..." /><a class="tooltip" href="#">?<span class="basic_tooltip">{$lang.TOOLTIP_COMIC_TITLE_CHOOSER}</span></a></div></dd>
+  </dl>
+        
+        
+</fieldset>
+    
+    <div id="event_list" name="event_list" style="height: 300px; overflow:scroll; display:none;">
+    
+    </div>
+{if $id > 0}
+<script>
+$(document).ready(
+	$(function(){
+		var comic_thumbnail_path = "{$image_path}{$comic_thumbnail_path}";
+		var character_thumbnail_path = "{$image_path}{$character_thumbnail_path}";
+		
+		var comic_list = {$comic_list};
+		var character_list = {$character_list};
+		var comic_id = $("#comic_id");
+		{literal}
+		comic_id.autocomplete({
+			source: comic_list,
+			select: function(event, ui){
+				$("#comic_image").val(ui.item.label);
+				$("#comic_image").attr('src', comic_thumbnail_path + ui.item.icon);
+				return false;
+			},
+			focus: function(event, ui){
+				$("#comic_id").val(ui.item.label);
+				return false;
+			},
+			messages:{
+				noResults: '',
+				results:function(){ return false;}
+			}
+		})
+		.data("ui-autocomplete")._renderItem = function(ul, item){
+			return $('<li>')
+				.append('<a><img src="' + comic_thumbnail_path + item.icon + '" height="30px">' + item.label + '</a>')
+				.appendTo(ul);
+		};
+		
+		var character_name = $("#character_name");
+		
+		character_name.autocomplete({
+			source: character_list,
+			select: function(event, ui){
+				$("#characters").append(
+					$("<li>").append(
+						$('<input type="checkbox" id="character_list" name="character_list[]" checked="checked">').attr({
+							"value": ui.item.value
+						})
+						.change(function(){
+							$(this).parent().remove();
+						})
+					)
+					.append(ui.item.label)
+				);
+				$("#character_name").val('');
+				return false;
+			},
+			focus: function(event, ui){
+				$("#character_name").val(ui.item.label);
+				return false;
+			},
+			messages:{
+				noResults: '',
+				results:function(){}
+			}
+		})
+		.data("ui-autocomplete")._renderItem = function(ul, item){
+			return $('<li>')
+				.append('<a><img src="' + character_thumbnail_path + item.icon + '" height="30px">' + item.label + '</a>')
+				.appendTo(ul);
+		};
+		
+	})
+	
+	
+);
+function update_days(){
+	
+	var selected_year = $("#year_published").val();
+	var selected_month = Number($("#month_published").val()) + 1;
+	
+	var days = new Date(selected_year, selected_month, 0).getDate();
+	
+	$("#day_published").html('');
+	
+	for(var a = 1; a <= days; a++){
+		$("#day_published").append("<option value='" + a + "'>" + a + "</option>");
+	}
+	
+}{/literal}
+</script>
+
+<form id="add_comic_form" action="{$php_self}?id={$id}" method="post" enctype="multipart/form-data">
+  <fieldset>
+      <div class="ui-widget">
+      <dl>
+          <dt><label for="comic_id">Comic Title:</label></dt>
+          <dd><div style="width:50px;height:100px;display:inline;"><img id="comic_image" width="50px"/></div><input type="text" id="comic_id" name="comic_id" value="{$comic.title}" /><a class="tooltip" href="#">?<span class="basic_tooltip">{$lang.TOOLTIP_COMIC_TITLE_CHOOSER}</span></a></dd>
+      </dl>
+      </div>
+      <dl>
+          <dt><label for="issue_number">Issue Number:</label></dt>
+          <dd><input name="issue_number" id="issue_number" type="text" value="{$event.issue_number}"/><a class="tooltip" href="#">?<span class="basic_tooltip">{$lang.TOOLTIP_ISSUE_NUMBER}</span></a></dd>
+      </dl>
+      
+      <dl>
+          <dt><label for="year_published">Year Published:</label></dt>
+          <dd><select name="year_published" id="year_published" onchange="update_days();">
+                  {foreach from=$year_published item=year}
+                    <option value="{$year}" {if $year == $event.year_published} selected="selected"{/if}>{$year}</option>
+                  {/foreach}
+              </select><a class="tooltip" href="#">?<span class="basic_tooltip">{$lang.TOOLTIP_YEAR_PUBLISHED}</span></a></dd>
+      </dl>
+      
+      <dl>
+          <dt><label for="month_published">Month Published:</label></dt>
+          <dd><select name="month_published" id="month_published" onchange="update_days();">
+                  {foreach from=$month_names key=month item=name}
+                    <option value="{$month}"{if $key == $event.month_published} selected="selected"{/if}>{$name}</option>
+                  {/foreach}
+              </select><a class="tooltip" href="#">?<span class="basic_tooltip">{$lang.TOOLTIP_MONTH_PUBLISHED}</span></a></dd>
+      </dl>
+      
+      <dl>
+          <dt><label for="day_published">Day Published:</label></dt>
+          <dd><select name="day_published" id="day_published">
+                 {foreach from=$day_published item=day}
+                    <option value="{$day}"{if $day == $event.day_published} selected="selected"{/if}>{$day}</option>
+                  {/foreach} 
+              </select><a class="tooltip" href="#">?<span class="basic_tooltip">{$lang.TOOLTIP_DAY_PUBLISHED}</span></a></dd>
+      </dl>
+      
+      <dl>
+          <dt><label for="comic_image">Comic Image:</label></dt>
+          <dd>
+              
+              <input name="file" id="file" type="file" value=""/><img src="{$image_path}{$event_thumbnail_path}{$event.image}" /><a class="tooltip" href="#">?<span class="basic_tooltip">{$lang.TOOLTIP_EVENT_IMAGE}</span></a></dd>
+      </dl>
+      
+      <dl>
+          <dt><label for="comic_summary">Comic Summary:</label><a class="tooltip" href="#">?<span class="basic_tooltip">{$lang.TOOLTIP_EVENT_SUMMARY}</span></a></dt>
+          <dd><textarea name="comic_summary" id="comic_summary" cols="50" rows="15">{$event.summary}</textarea></dd>
+      </dl>
+      
+      
+      <dl>
+          <dt><label for="character_list">Character List</label></dt>
+          <dd><div class="ui-widget"><input type="text" name="character_name" id="character_name" placeholder="Start typing..." /><a class="tooltip" href="#">?<span class="basic_tooltip">{$lang.TOOLTIP_CHARACTER_LIST}</span></a></div>
+          <div>
+          	<ul id="characters">
+            {foreach from=$characters item=c}
+				<li><input type="checkbox" id="character_list" name="character_list[]" checked="checked" value="{$c.character_id}">{$c.name}</li>
+            {/foreach}
+            </ul>
+          </div></dd>
+      </dl>
+      
+      <input name="reset" id="reset" type="reset" /><input name="submit" id="submit" type="submit" value="submit" />
+	<input type="hidden" name="id" value="{$id}" />
+    <input type="hidden" name="ori_comic" value="{$event.comic}" />
+    <input type="hidden" name="ori_issue_number" value="{$event.issue_number}" />
+    <input type="hidden" name="ori_year_published" value="{$event.year_published}" />
+    <input type="hidden" name="ori_month_published" value="{$event.month_published}" />
+    <input type="hidden" name="ori_day_published" value="{$event.day_published}" />
+    <input type="hidden" name="ori_image" value="{$event.image}" />
+    <input type="hidden" name="ori_summary" value="{$event.summary}" />
+    <input type="hidden" name="ori_characters" value="{$ori_characters}" />
+    <input type="hidden" name="ori_edited" value="{$ori_edited}" />
+  </fieldset>
+</form>
+
+{/if}
+
+{include file='footer.html'}

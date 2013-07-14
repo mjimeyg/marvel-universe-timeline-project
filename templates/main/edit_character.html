@@ -1,0 +1,83 @@
+{include file='header.html'}
+{if $success == true}
+<div class="form_success_result">
+	
+    <div><strong>{$values.name} - UPDATED</strong></div>
+    <div><img src="{$image_path}{$character_thumbnail_path}{$values.image}" /></div>
+    <div><a href="{$values.href}">{$values.href}</a></div>
+</div>
+{/if}
+{if $errors != ""}
+<div class="form_errors">
+	{$errors}
+</div>
+{/if}
+
+
+<script>
+	$(document).ready(function(){
+		var character_thumbnail_path = "{$image_path}{$character_thumbnail_path}";
+		
+		var character_list = {$character_list};
+		
+		$("#character_list").autocomplete({
+			source: character_list,
+			select: function(event, ui){
+				window.location = '{$php_self}?id=' + ui.item.value;
+				return false;
+			},
+			focus: function(event, ui){
+				$("#character_list").val(ui.item.label);
+				return false;
+			},
+			messages:{
+				noResults: '',
+				results:function(){}
+			}
+		})
+		.data("ui-autocomplete")._renderItem = function(ul, item){
+			return $('<li>')
+				.append('<a><img src="' + character_thumbnail_path + item.icon + '" height="30px">' + item.label + '</a>')
+				.appendTo(ul);
+		};
+	});
+</script>
+
+	<fieldset>
+		<dl>
+          <dt><label for="character_list">Character List <a class="tooltip" href="#">?<span class="basic_tooltip">{$lang.TOOLTIP_CHARACTER_CHOOSER}</span></a></label></dt>
+          <dd><div class="ui-widget"><input type="text" name="character_list" id="character_list" placeholder="Start typing..." /></div></dd>
+      	</dl>
+	</fieldset>
+
+{if $id > 0}
+<form id="add_character_form" action="{$php_self}" method="post" enctype="multipart/form-data">
+    <fieldset>
+        
+        <dl>
+            <dt><label for="character_name">Character Name: <a class="tooltip" href="#">?<span class="basic_tooltip">{$lang.TOOLTIP_CHARACTER_NAME}</span></a></label></dt>
+            <dd><input name="character_name" id="character_name" type="text" value="{$character_name}" /></dd>
+        </dl>
+        
+        <dl>
+            <dt><label for="file">Character Image: <a class="tooltip" href="#">?<span class="basic_tooltip">{$lang.TOOLTIP_CHARACTER_IMAGE}</span></a></label></dt>
+            <dd><input name="file" id="file" type="file" /><img src="{$image_path}{$character_thumbnail_path}{$character_image}" /></dd>
+        </dl>
+        
+        <dl>
+            <dt><label for="character_source">Character Source: <a class="tooltip" href="#">?<span class="basic_tooltip">{$lang.TOOLTIP_CHARACTER_SOURCE}</span></a></label></dt>
+            <dd><input name="character_source" id="character_source" type="text" value="{$character_source}" /></dd>
+        </dl>
+        
+        <p><input name="reset" id="reset" type="reset" />&nbsp;&nbsp;<input name="submit" id="submit" type="submit" value="submit" /></p>
+        
+        <input type="hidden" name="id" value="{$_GET.id}" />
+        <input type="hidden" name="ori_name" value="{$character_name}" />
+        <input type="hidden" name="ori_image" value="{$character_image}" />
+        <input type="hidden" name="ori_source" value="{$character_source}" />
+        <input type="hidden" name="ori_edited" value="{$edited_by}" />
+        
+    </fieldset>
+</form>
+{/if}
+{include file='footer.html'}
