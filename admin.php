@@ -7,8 +7,8 @@ try
 {
 	if(!is_logged_in())
 	{
-		$fb_user = 0;
-		print_r("You must be logged in to use these pages.");
+		$smarty->assign('exception', "You must be logged in to use these pages.");
+		$page = 'exception.html';
 		
 	}
 	else
