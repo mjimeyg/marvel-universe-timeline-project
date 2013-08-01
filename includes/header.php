@@ -5,6 +5,10 @@ include_once 'includes/functions.php';
 require_once('smarty/libs/Smarty.class.php');
 include_once 'language/en.php';
 global $con;
+
+create_session();
+
+
 $old_error_handler = set_error_handler("mu_error_handler");
 //print_r($_SESSION);
 $url="http://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
@@ -32,7 +36,7 @@ $smarty->assign('month_names', $month_names);
 
 $smarty->assign('is_logged_in', is_logged_in());
 
-if(strpos($_SERVER['PHP_SELF'], 'view_event'))
+if(strpos($_SERVER['PHP_SELF'], 'view_event') || strpos($_SERVER['PHP_SELF'], 'index.php?id'))
 {
 	$sql = "SELECT *, " . TABLE_EVENT . ".image AS event_image FROM " . TABLE_EVENT . " INNER JOIN " . TABLE_COMIC . " ON " . TABLE_EVENT . ".comic=" . TABLE_COMIC . ".id WHERE " . TABLE_EVENT . ".id=" . $_GET['id'];
 	
@@ -45,8 +49,17 @@ if(strpos($_SERVER['PHP_SELF'], 'view_event'))
 	$smarty->assign('event_description', $event['description']);
 	$smarty->assign('event_link', $event['link']);
 	$smarty->assign('event_image', $event['image']);
-	
+	$smarty->assign('site_name', $page_title . ' - ' . $event['title']);
 	$smarty->assign('event_path', 'index.php?id=' . $_GET['id']);
+}
+else
+{
+	//$smarty->assign('event_title', $event['title']);
+	$smarty->assign('event_description', $event['description']);
+	$smarty->assign('event_link', $event['link']);
+	$smarty->assign('event_image', $event['image']);
+	
+	$smarty->assign('event_path', $_SERVER['PHP_SELF']);
 }
 
 
