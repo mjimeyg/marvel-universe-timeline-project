@@ -29,6 +29,8 @@ $event_thumbnail_path = 'event_thumbnails/';
 
 $character_thumbnail_path = 'character_thumbnails/';
 
+$site_name = 'Marvel Timeline Project';
+
 define('ACTIVE_USER',		0);
 define('BANNED_USER',		2);
 
@@ -40,7 +42,10 @@ define('TABLE_COMIC',				$table_prefix . 'comic');
 define('TABLE_CONFIG',				$table_prefix . 'config');
 define('TABLE_EVENT',				$table_prefix . 'event');
 define('TABLE_LOG',					$table_prefix . 'log');
+define('TABLE_SESSIONS',			$table_prefix . 'sessions');
 define('TABLE_USERS',				$table_prefix . 'users');
+define('TABLE_VISITORS',			$table_prefix . 'visitors');
+define('TABLE_BOTS',				$table_prefix . 'bots');
 
 define('FILE_TYPE_IMAGE',	0);
 define('FILE_TYPE_BANNED',	1);
