@@ -75,17 +75,40 @@ function fb_login()
 
 function is_logged_in()
 {
-	global $facebook;
+	global $facebook, $fb_config, $session;
 	try
 	{
+		
 		$result = $facebook->api('/me', 'get');
 		
 		if(isset($result['id']))
 		{
+			$session['access_token'] = $facebook->getAccessToken();
 			return true;
 		}
-	
-		return false;	
+		
+		if(isset($session['access_token']))
+		{
+			$facebook->setAccessToken($session['access_token']);
+			$result = $facebook->api('/me', 'get');
+			
+			if(isset($result['id']))
+			{
+				return true;
+			}
+		}
+		
+		if(isset($_COOKIE['fbsr_' . $fb_config['appId']]))
+		{
+			$facebook->setAccessToken($_COOKIE['fbsr_' . $fb_config['appId']]);
+			$result = $facebook->api('/me', 'get');
+			
+			if(isset($result['id']))
+			{
+				$session['access_token'] = $facebook->getAccessToken();
+				return true;
+			}
+		}
 	}
 	catch(FacebookApiException $ex)
 	{
@@ -93,7 +116,157 @@ function is_logged_in()
 	}
 }
 
+function is_a_bot($ip, $ua)
+{
+	global $con;
+	
+	$sql = "SELECT * FROM " . TABLE_BOTS . " WHERE ip_address='$ip' AND uas='$ua'";
+	
+	$result = mysqli_query($con, $sql);
+	
+	if($result->num_rows > 0)
+	{
+		return mysqli_fetch_assoc($result);
+	}
+	else
+	{
+		return false;
+	}
+}
 
+function find_session()
+{
+	global $con;
+	
+	$ua = $_SERVER['HTTP_USER_AGENT'];
+	$ip = $_SERVER['REMOTE_ADDR'];
+	
+	$sql = "SELECT * FROM " . TABLE_SESSIONS . " WHERE ip_address='$ip' AND user_agent='$ua'";
+	
+	$result = mysqli_query($con, $sql);
+	
+	if($result->num_rows > 0)
+	{
+		$row = mysqli_fetch_assoc($result);
+		
+		mysqli_free_result($result);
+		
+		return $row;
+	}
+	else
+	{
+		
+		return false;
+	}
+}
+
+function create_session()
+{
+	global $con, $session;
+	
+	$ua = $_SERVER['HTTP_USER_AGENT'];
+	$ip = $_SERVER['REMOTE_ADDR'];
+	
+	$bot = is_a_bot($ip, $us);
+	
+	if(isset($_SESSION['mu_session']))
+	{
+		$session = $_SESSION['mu_session'];
+	}
+	elseif(!($session = find_session()))
+	{
+		
+		
+		$sql = "INSERT INTO " . TABLE_SESSIONS . "(ip_address, user_agent, bot) VALUES('$ip','" . addslashes($ua) . "','" . (!$bot ? 0 : json_encode($bot)) . "')";
+		
+		$result = mysqli_query($con, $sql);
+		
+		if(!$result)
+		{
+			print_r(mysqli_error($con));
+			throw new Exception("Could not enter session into database.", 0);
+			
+		}
+		
+		$session = find_session();
+		
+		if(!$session)
+		{
+			throw new Exception("Unknown error whilst creating session.", 0);
+		}
+		else
+		{
+			$_SESSION['mu_session'] = $session;
+		}
+	}
+	
+	if(!$bot)
+	{
+		update_visitors_log($ip);
+	}
+	update_session();
+}
+
+function update_session()
+{
+	global $con, $session, $fb_config;
+	
+	$values = array();
+	
+	$values['last_activity'] = date('Y-m-d H:i:s');
+	
+	$values['last_page'] = $_SERVER['PHP_SELF'];
+	
+	if(is_logged_in())
+	{
+		$values['access_token'] = $session['access_token'];
+	}
+	
+	$sql = build_update_query(TABLE_SESSIONS, $values, "id=" . $session['id']);
+	
+	$result = mysqli_query($con, $sql);
+	
+	if(!$result)
+	{
+		throw new Exception(mysqli_error($con));
+	}
+	
+	array_merge($session, $values);
+	
+	$_SESSION['mu_session'] = $session;
+	
+	return true;
+}
+
+function update_visitors_log($ip)
+{
+	global $con;
+	
+	$sql = "SELECT * FROM " . TABLE_VISITORS . " WHERE ip_address='" . $ip . "'";
+	
+	$result = mysqli_query($con, $sql);
+	
+	
+	
+	if(mysqli_num_rows($result) > 0)
+	{
+		$row = mysqli_fetch_array($result);
+		
+		if(strtotime($row['last_visit']) < strtotime('-1 day',time()))
+		{
+		
+			$sql = "UPDATE " . TABLE_VISITORS . " SET visits=" . ($row['visits'] + 1) . ", last_visit=NOW() WHERE ip_address='" . $ip . "'";
+			//echo $sql;
+			mysqli_query($con, $sql);
+		}
+	}
+	else
+	{
+		$sql = "INSERT INTO " . TABLE_VISITORS . "(ip_address, visits) VALUES('" . $ip . "',1)";
+		
+		mysqli_query($con, $sql);
+	}
+}
 
 function build_update_query($table, $values, $where)
 {
