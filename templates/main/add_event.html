@@ -16,14 +16,14 @@
 {literal}
 <script>
 $(document).ready(
-    $(function(){
+    $(function(){{/literal}
         var comic_thumbnail_path = "{$image_path}{$comic_thumbnail_path}";
         var character_thumbnail_path = "{$image_path}{$character_thumbnail_path}";
         
         var comic_list = {$comic_list};
         var character_list = {$character_list};
         var comic_id = $("#comic_id");
-        
+        {literal}
         comic_id.autocomplete({
             source: comic_list,
             select: function(event, ui){
